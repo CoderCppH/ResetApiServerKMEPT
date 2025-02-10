@@ -5,13 +5,11 @@ namespace web_server{
         static async Task Main(){
 
             Console.WriteLine("Server start");
-            WebBody body = new WebBody();
-            WebHead head = new WebHead(body);
+            WebHead head = new WebHead();
             while(true)
             {
                 await head.Loop();
             }
-
         }
     }
 }

@@ -1,16 +1,15 @@
 using System.Net;
+using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 namespace web_server{
     class WebHead{
-        private WebBody Body = new WebBody();
         private DataBaseConnection db = new DataBaseConnection();
         private HttpListener server = new HttpListener();
-        public WebHead(WebBody body){   
+        public WebHead(){   
             server.Prefixes.Add(Values.HTTP_HEAD_URL);
             server.Start();
-            this.Body = body;
             InitDataBase();
         }
         private async void WriteHttp(HttpListenerResponse response, string text){
@@ -21,21 +20,28 @@ namespace web_server{
                 await stream.FlushAsync();
             }
         }
-        private string Read(HttpListenerRequest request){
-            byte [] buffer = new byte[request.ContentLength64];
-            using(var stream = request.InputStream)
-                stream.Read(buffer, 0, buffer.Length);
-            
-            return Encoding.ASCII.GetString(buffer);
-        }
         private void InitDataBase(){
             db = new DataBaseConnection(db_name:Values.DB_NAME);
             db.OpenConnection();
             //create table user-data
+            
             SQLiteUser.database = db;
             SQLiteUser.CreateTable();
+
             SQLiteAesKeyIv.database = db;
             SQLiteAesKeyIv.CreateTable();
+        
+            SQLiteGroup.dataBase = db;
+            SQLiteGroup.CreateTable();
+
+            SQLiteGroupMembers.dataBase = db;
+            SQLiteGroupMembers.CreateTable();
+
+            SQLiteMessanger.dataBase = db;
+            SQLiteMessanger.CreateTable();
+
+            SQLiteChat.dataBase = db; 
+            SQLiteChat.CreateTable();
         }
         public async Task Loop(){
             string output_text = "";
@@ -83,6 +89,10 @@ namespace web_server{
                             output_text = JsonConvert.SerializeObject(kiv);
                         }
                     }
+                }break;
+                case "/image":
+                {
+                    output_text = File.ReadAllText(@"C:\Users\SystemX\Pictures\Saved Pictures\img2.jpg", Encoding.UTF8);
                 }break;
                 default:    {   output_text = "__def_text__";   }break;
             }
