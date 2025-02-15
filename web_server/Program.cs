@@ -3,13 +3,15 @@ using Newtonsoft.Json;
 namespace web_server{
     class Program{
         static async Task Main(){
-
+            ThreadKeyBoard tkh = new ThreadKeyBoard();
             Console.WriteLine("Server start");
             WebHead head = new WebHead();
-            while(true)
+            while(!tkh.GetExitMainThread())
             {
-                await head.Loop();
+                await head.Loop(tkh);
             }
+            head.Close();
+            tkh.Close();
         }
     }
 }

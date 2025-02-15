@@ -1,9 +1,12 @@
+using System.Data;
 using System.Data.SQLite;
+using System.Data.SqlTypes;
 using System.Security.Cryptography.X509Certificates;
+using Newtonsoft.Json;
 
 namespace web_server
 {
-    class SQLiteAesKeyIv
+    class SQLiteAesKeyIv: OrmSqlTable
     {
         public static string @nameTable = "aes_key_iv";
         public static string @id = "@id";
@@ -21,7 +24,7 @@ namespace web_server
             using(SQLiteCommand command = new SQLiteCommand(sqlCommand, database.GetConnection()))
                 command.ExecuteNonQuery();
         }
-        public bool Create()
+        override public bool Create()
         {
             string sqlCommand = $"INSERT INTO {@nameTable} (key, iv, id_user ) VALUES ({@key}, {@iv}, {@id_user} ) ";
             using(SQLiteCommand command = new SQLiteCommand(sqlCommand, database.GetConnection()))
@@ -34,6 +37,27 @@ namespace web_server
                     return true;
             }
             return false;
+        }
+        public override bool IsNotNull()
+        {
+            if(Key != null && IV != null)
+                return true;
+            return false;
+        }
+        public static List<SQLiteAesKeyIv> GetAllAes()
+        {
+            List<SQLiteAesKeyIv> listAes = new List<SQLiteAesKeyIv>();
+            string sqlCommand = $"SELECT * FROM {nameTable}";
+            using(SQLiteDataReader read = new SQLiteCommand(sqlCommand, database.GetConnection()).ExecuteReader())
+                while(read.Read())
+                    listAes.Add(new SQLiteAesKeyIv(){Id = read.GetInt32(0), Key=(byte[])read["key"], IV=(byte[])read["iv"], IdUser = read.GetInt32(3)  });
+            return listAes;
+        }
+        public static SQLiteAesKeyIv GetAesByIdUser(int id_user){
+            foreach(var i_aes in GetAllAes())
+                if(i_aes.IdUser == id_user)
+                    return i_aes;
+            return null;
         }
     }
 }

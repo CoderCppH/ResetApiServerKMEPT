@@ -1,7 +1,11 @@
+using System.Configuration;
 using System.Data.SQLite;
+using System.Runtime.Intrinsics.Arm;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace web_server{
-    class SQLiteUser{
+    class SQLiteUser: OrmSqlTable{
         //name
         public static string @nameTable = "user_data";
         public static string @id = "@id";
@@ -20,9 +24,9 @@ namespace web_server{
             using(SQLiteCommand command = new SQLiteCommand(sqlCommand, database.GetConnection()))
                 command.ExecuteNonQuery();
         }
-        public bool Create()
+        public override bool Create()
         {
-            if(!IsUser()){
+            if(!IsObject()){
                 string sqlCommand = $"INSERT INTO {@nameTable} (fullname, email, password) VALUES ({@fullname}, {@email}, {@password})";
                 using(SQLiteCommand  command = new SQLiteCommand(sqlCommand, database.GetConnection())){
                     command.Parameters.AddWithValue(@fullname, FullName);
@@ -35,7 +39,7 @@ namespace web_server{
             }
             return false;
         }
-        public static List<SQLiteUser> GetUsers()
+        public static List<SQLiteUser> GetAllUser()
         {
             List<SQLiteUser> users = new List<SQLiteUser>();
             string sqlCommand = $"SELECT * FROM {@nameTable}";
@@ -47,16 +51,29 @@ namespace web_server{
             }
             return users;
         }
-        public static SQLiteUser GetByIdOrEmailUser(SQLiteUser user){
-            foreach(var Iuser in GetUsers())
-                if(Iuser.Email == user.Email || Iuser.Id == user.Id)
+        public override bool IsNotNull()
+        {
+            if(Email != string.Empty && Password != string.Empty && FullName != string.Empty)
+                return true;
+            return false;
+        }
+        public static SQLiteUser GetByIdOrEmailUser(int id_user, string email_user){
+            foreach(var Iuser in GetAllUser())
+                if(Iuser.Email == email_user || Iuser.Id == id_user)
                     return Iuser;
             return null;
         }
-        public bool IsUser()
+        public bool IsObject()
         {
-            foreach(var Iuser in GetUsers())
+            foreach(var Iuser in GetAllUser())
                 if(Iuser.Email == Email || Iuser.Id == Id)
+                    return true;
+            return false;
+        }
+        public bool CheckPassword(string hashPasswordSHA256)
+        {
+            foreach(var i_user in GetAllUser())
+                if(i_user.Password.Equals(hashPasswordSHA256))
                     return true;
             return false;
         }
