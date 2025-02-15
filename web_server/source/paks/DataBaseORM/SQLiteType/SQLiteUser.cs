@@ -1,4 +1,5 @@
 using System.Configuration;
+using System.Data.Entity.Validation;
 using System.Data.SQLite;
 using System.Runtime.Intrinsics.Arm;
 using System.Text;
@@ -68,6 +69,16 @@ namespace web_server{
             foreach(var Iuser in GetAllUser())
                 if(Iuser.Email == Email || Iuser.Id == Id)
                     return true;
+            return false;
+        }
+        public bool Login(string original_password)
+        {
+            string hashPasswordSHA256 = WebSha256.CalcSha256($"{0}#{FullName}@{Email}?{original_password}");
+            foreach(var user in GetAllUser()){
+                if(user.Email == Email && user.Password == hashPasswordSHA256){
+                    return true;
+                }
+            }
             return false;
         }
         public bool CheckPassword(string hashPasswordSHA256)

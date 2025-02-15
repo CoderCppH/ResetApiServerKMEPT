@@ -1,3 +1,4 @@
+using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Reflection.Metadata;
@@ -79,8 +80,40 @@ namespace web_server{
                             }
                         }
                         catch{}
-                    }                  
+                    }
+                               
                 } break;
+                case "/login_user":{
+                    using(var input = request.InputStream)
+                    {
+                        byte[] buffer = new byte[request.ContentLength64];
+                        await input.ReadAsync(buffer, 0, buffer.Length);
+                        string json_text = Encoding.UTF8.GetString(buffer);
+                        JsonUser jsonUser = new JsonUser();
+                        if(json_text != string.Empty){
+                            try{
+                                jsonUser = JsonConvert.DeserializeObject<JsonUser>(json_text);
+                            }catch{}
+                            SQLiteUser sqlUser = new SQLiteUser(){ Id = jsonUser.id, FullName = jsonUser.fullname, Email = jsonUser.email, Password = jsonUser.password};
+                            if(sqlUser.IsNotNull()){
+                                if(sqlUser.IsObject()){      
+                                    var json_otvet = new { code_status = sqlUser.Login(jsonUser.password) };
+                                    output_text = JsonConvert.SerializeObject(json_otvet);
+                                }
+                                else
+                                {
+                                    var json_otvet = new { code_status = false};
+                                    output_text = JsonConvert.SerializeObject(json_otvet);
+                                }
+                            }
+                            else
+                            {
+                                var json_otvet = new { code_status = false};
+                                output_text = JsonConvert.SerializeObject(json_otvet);
+                            }
+                        }
+                    }
+                }break;
                 case "/make_cri":{
                     using(Aes aes = Aes.Create()){
                         using(var input = request.InputStream){
