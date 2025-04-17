@@ -11,10 +11,13 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.ACTIVITY.MainMenuActivity
+import com.example.myapplication.API.ApiClient
 import com.example.myapplication.CONFIG_USER.ConfigUser
-import com.example.myapplication.CONFIG_USER.p_config_user
+import com.example.myapplication.CONFIG_USER.sql_p_user
+import com.example.myapplication.GL.GL
 import com.example.myapplication.MAILSS.MailSs
 import com.example.myapplication.SETUP.SetUp
+import com.google.gson.Gson
 import kotlin.concurrent.thread
 import kotlin.random.Random
 
@@ -27,8 +30,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Init();
     }
-    private fun Init()
-    {
+    private fun Init() {
         SetUp(this)
         img = findViewById(R.id.img_V)
         loop_rotation_img()
@@ -37,9 +39,9 @@ class MainActivity : AppCompatActivity() {
         if(user.id >= 0) {
             next_activity()
         }
+
     }
-    private fun loop_rotation_img()
-    {
+    private fun loop_rotation_img() {
         thread(){
             var y:Double = 0.0
             while (true)
@@ -50,8 +52,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    private fun rotation_img(y_float:Double)
-    {
+    private fun rotation_img(y_float:Double)  {
         img.rotationY = y_float.toFloat();
         img.rotationX = y_float.toFloat();
     }
@@ -64,8 +65,7 @@ class MainActivity : AppCompatActivity() {
         }
         return code
     }
-    fun check_gmail_index(email:String):Boolean
-    {
+    fun check_gmail_index(email:String):Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email.toString()).matches()
     }
     private fun next_activity() {
@@ -102,12 +102,49 @@ class MainActivity : AppCompatActivity() {
                             Log.d("input_code", "SUCCESS")
 
                             var config_user = ConfigUser(this);
-                            var p_user = p_config_user();
+                            var p_user =
+                                sql_p_user();
                             p_user.email = email_string
                             p_user.id = 0;
                             p_user.full_name = "user_" + g_code
-                            config_user.edit_config_user(p_user)
-                           next_activity()
+
+                            var gson = Gson();
+
+                            var api = ApiClient();
+
+                            var res = api.POST(
+                                GL.url_api_server + "make_user",
+                                gson.toJson(p_user)
+                            );
+
+                            if (res.equals("{\"code_status\":true}")) {
+                                config_user.edit_config_user(p_user)
+                                next_activity()
+                            }
+                            else {
+
+                                config_user.edit_config_user(p_user)
+                                next_activity()
+
+                                res = api.POST(
+                                    GL.url_api_server + "login_user",
+                                    gson.toJson(p_user)
+                                );
+
+                                if (res.equals("{\"code_status\":true}")) {
+
+                                    config_user.edit_config_user(p_user)
+                                    next_activity()
+
+                                } else {
+                                    Toast.makeText(
+                                        this,
+                                        "хмм где-то ошибка: " + res.toString(),
+                                        Toast.LENGTH_SHORT
+                                    ).show();
+
+                                }
+                            }
                         }
                     })
                 }

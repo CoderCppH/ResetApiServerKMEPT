@@ -32,19 +32,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
         </TextView>
+
         <EditText
             android:id="@+id/activity_main_edit_text_email"
-            android:inputType="textEmailAddress"
-            android:padding="10dp"
-            android:textSize="20dp"
-            android:textColorHint="@color/Tint"
-            android:textColor="@color/black"
-            android:hint="simpleEmail@gmail.com"
+            android:layout_width="300dp"
+            android:layout_height="40sp"
             android:layout_marginTop="20dp"
             android:background="@drawable/style_edit_text_defult_back"
-            android:layout_width="300dp"
-            android:layout_height="40sp">
-        </EditText>
+            android:hint="simpleEmail@gmail.com"
+            android:inputType="textEmailAddress"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/Tint"
+            android:textSize="20dp"></EditText>
 
         <Button
             android:onClick="on_click_go_to"

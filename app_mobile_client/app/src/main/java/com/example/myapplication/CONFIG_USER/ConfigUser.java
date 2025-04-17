@@ -1,6 +1,5 @@
 package com.example.myapplication.CONFIG_USER;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -11,7 +10,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
 public class ConfigUser {
@@ -19,12 +17,12 @@ public class ConfigUser {
     private  Context context;
     private File file;
     public ConfigUser(Context context) {
-        file = new File(context.getFilesDir(), ConfigPath);
         this.context = context;
+        file = new File(context.getFilesDir(), ConfigPath);
     }
-    public p_config_user get_user() {
-        p_config_user user = new p_config_user();
-        if(file.exists()) {
+    public sql_p_user get_user() {
+        sql_p_user user = new sql_p_user();
+        if(file != null && file.exists()) {
             String json;
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -35,7 +33,7 @@ public class ConfigUser {
                 throw new RuntimeException(e);
             }
             Gson gson = new Gson();
-            user = gson.fromJson(json, p_config_user.class);
+            user = gson.fromJson(json, sql_p_user.class);
         }
         else {
             user.id = -1;
@@ -50,9 +48,9 @@ public class ConfigUser {
         }
         return user;
     }
-    public void edit_config_user(p_config_user user) {
+    public void edit_config_user(sql_p_user user) {
         try {
-            FileOutputStream fileOutputStream = context.openFileOutput("config.cnf", Context.MODE_PRIVATE);
+            FileOutputStream fileOutputStream = context.openFileOutput(ConfigPath, Context.MODE_PRIVATE);
             Gson gson = new Gson();
             fileOutputStream.write(gson.toJson(user).getBytes());
             fileOutputStream.close();
