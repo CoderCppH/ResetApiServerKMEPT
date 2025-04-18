@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:padding="15dp"
+    android:background="#00BCD4"
+    android:layout_margin="5dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -15,13 +17,13 @@
         android:paddingBottom="10dp"
         android:text="fullname"
         android:textAlignment="center"
-        android:textSize="35dp"
+        android:textSize="10dp"
         android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/id_const_item_user_list_image_profile"
-        android:layout_width="100dp"
-        android:layout_height="100dp" />
+        android:layout_width="50dp"
+        android:layout_height="50dp" />
 
     <TextView
         android:id="@+id/id_const_item_user_list_email"
@@ -33,7 +35,7 @@
         android:paddingTop="10dp"
         android:text="email"
         android:textAlignment="center"
-        android:textSize="25dp"
+        android:textSize="15dp"
         android:textStyle="bold" />
 
 </RelativeLayout>
