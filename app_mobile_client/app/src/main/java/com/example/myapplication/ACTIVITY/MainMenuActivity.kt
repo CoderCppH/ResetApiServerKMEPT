@@ -13,16 +13,52 @@ import androidx.fragment.app.Fragment
 import com.example.myapplication.CONFIG_USER.ConfigUser
 import com.example.myapplication.R
 import com.example.myapplication.SETUP.SetUp
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.gson.Gson
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
+import com.example.myapplication.UI.FrindaListFragment.FrindaListFragment
+import com.example.myapplication.UI.LentaListFragment.LentaListFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 class MainMenuActivity : AppCompatActivity() {
     lateinit var user_config:ConfigUser;
+    private lateinit var bottomNavigationView: BottomNavigationView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_menu_activity)
-        Init();
 
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
+
+        // Установка начального фрагмента
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, FrindaListFragment())
+                .commit()
+        }
+
+        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.id_friend_list_menu -> {
+                    replaceFragment(FrindaListFragment())
+                    true
+                }
+                R.id.id_lenta_list_menu -> {
+                    replaceFragment(LentaListFragment())
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+        Init();
+    }
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

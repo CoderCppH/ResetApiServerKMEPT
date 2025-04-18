@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myapplication.LIST_LENTA.p_lenta_item;
 import com.example.myapplication.R;
 
 import java.util.List;
@@ -44,7 +45,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     public int getItemCount() {
         return list_user.size();
     }
-
+    public void AddItem(p_user_item item) {
+        list_user.add(item);
+        notifyItemInserted(list_user.size() - 1);
+    }
     public class ViewHolder extends RecyclerView.ViewHolder
     {
         TextView fullname, email;
