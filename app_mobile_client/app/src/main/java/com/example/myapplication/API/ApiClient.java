@@ -1,5 +1,7 @@
 package com.example.myapplication.API;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -41,9 +43,9 @@ public class ApiClient {
             URL obj = new URL(url);
             HttpURLConnection objConnectURL = (HttpURLConnection) obj.openConnection();
             objConnectURL.setRequestMethod("GET");
-            objConnectURL.setRequestProperty("User -Agent", "Mozilla/5.0");
+            objConnectURL.setRequestProperty("User-Agent", "Mozilla/5.0");
             int responseCode = objConnectURL.getResponseCode();
-
+            Log.d("RESPONSE_CODE",String.valueOf(responseCode));
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader in = new BufferedReader(new InputStreamReader(objConnectURL.getInputStream()));
                 String inputLine;
@@ -56,8 +58,8 @@ public class ApiClient {
                 return response.toString();
             }
         } catch(Exception ex) {
-            ex.printStackTrace();
+            Log.d("API.GET.ERROR", ex.getMessage());
         }
-        return "";
+        return "error";
     }
 }

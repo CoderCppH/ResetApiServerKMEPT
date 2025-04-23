@@ -1,5 +1,6 @@
 package com.example.myapplication.UI.FrindaListFragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.myapplication.ACTIVITY.FriendAddActivity;
 import com.example.myapplication.LIST_USER.UserAdapter;
 import com.example.myapplication.LIST_USER.p_user_item;
 import com.example.myapplication.R;
@@ -40,14 +42,18 @@ public class FrindaListFragment extends Fragment {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                p_user_item item = new p_user_item(R.drawable.ic_launcher_foreground, "Pargev", "coder.cpp.h@gmail.com");
-                adapter.AddItem(item);
+                //p_user_item item = new p_user_item(R.drawable.ic_launcher_foreground, "Pargev", "coder.cpp.h@gmail.com");
+                //adapter.AddItem(item);
+                Intent intent = new Intent(view.getContext(), FriendAddActivity.class);
+                startActivity(intent);
             }
         });
     }
     private List<p_user_item> getData() {
         ArrayList<p_user_item> list = new ArrayList<p_user_item>();
         p_user_item item = new p_user_item(R.drawable.ic_launcher_foreground, "admin", "Anton234@gmail.com");
+        list.add(item);
+        list.add(item);
         list.add(item);
         return list;
     }

@@ -15,6 +15,7 @@
             android:layout_height="60dp">
                 <Button
                     android:id="@+id/btn_add_friend"
+                    android:backgroundTint="#4CAF50"
                     android:text="Add"
                     android:layout_margin="5dp"
                     android:layout_width="wrap_content"

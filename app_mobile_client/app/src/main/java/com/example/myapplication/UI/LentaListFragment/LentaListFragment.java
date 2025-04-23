@@ -41,6 +41,10 @@ public class LentaListFragment extends Fragment {
         item.image = R.drawable.food;
         item.name = "food";
         list.add(item);
+        item = new p_lenta_item();
+        item.image = R.drawable.youtube;
+        item.name = "youtosyuiydsusduyfisdyfusidyfiusdyfuidsyfiusydfiuysdfiuyfiudsyuifdsube";
+        list.add(item);
         return list;
     }
 }

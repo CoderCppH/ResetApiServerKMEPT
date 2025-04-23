@@ -44,9 +44,9 @@ public class ApiClient {
             URL obj = new URL(url);
             HttpURLConnection objConnectURL = (HttpURLConnection) obj.openConnection();
             objConnectURL.setRequestMethod("GET");
-            objConnectURL.setRequestProperty("User -Agent", "Mozilla/5.0");
+            objConnectURL.setRequestProperty("User-Agent", "Mozilla/5.0");
             int responseCode = objConnectURL.getResponseCode();
-
+            System.out.println(responseCode);
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader in = new BufferedReader(new InputStreamReader(objConnectURL.getInputStream()));
                 String inputLine;
@@ -59,8 +59,9 @@ public class ApiClient {
                 return response.toString();
             }
         } catch(Exception ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
+            System.err.println("cath");
         } 
-        return "";
+        return "error";
     }
 }

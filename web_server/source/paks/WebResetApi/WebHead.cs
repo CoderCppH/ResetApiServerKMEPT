@@ -5,6 +5,7 @@ using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
+using web_server.source.paks.DataBaseORM.SQLiteType;
 namespace web_server{
     class WebHead{
         private DataBaseConnection db = new DataBaseConnection();
@@ -44,6 +45,9 @@ namespace web_server{
 
             SQLiteChat.dataBase = db; 
             SQLiteChat.CreateTable();
+
+            SQLiteGroupsFriend.database = db;
+            SQLiteGroupsFriend.CreateTable();
         }
         public async Task Loop(ThreadKeyBoard tkh){
             string output_text = "";
@@ -177,6 +181,48 @@ namespace web_server{
                         }  
                    }
                 }break;
+                case "/get_list_user": {
+                        string list_user_json = JsonConvert.SerializeObject(SQLiteUser.GetAllUser());
+                        output_text = list_user_json;
+                    } break;
+                case "/get_all_my_friends": {
+                        using (var input = request.InputStream)
+                        {
+                            Console.WriteLine("input");
+                            byte[] buffer = new byte[request.ContentLength64];
+                            await input.ReadAsync(buffer, 0, buffer.Length);
+                            string json = Encoding.UTF8.GetString(buffer);
+                            JsonUser user = JsonConvert.DeserializeObject<JsonUser>(json);
+                            var list_user = SQLiteGroupsFriend.GetAllReturnAllMyFriendsById(user.id);
+                            output_text = JsonConvert.SerializeObject(list_user);
+                        }
+                    } break;
+                case "/add_firend":
+                    {
+                        using (var input = request.InputStream)
+                        {
+                            byte[] buffer = new byte[request.ContentLength64];
+                            await input.ReadAsync(buffer, 0, buffer.Length);
+                            string json = Encoding.UTF8.GetString(buffer);
+                            p_gorups_friends group = JsonConvert.DeserializeObject<p_gorups_friends>(json);
+                            SQLiteGroupsFriend sQLiteGroupsFriend = new SQLiteGroupsFriend();
+                            sQLiteGroupsFriend.Id = group.id;
+                            sQLiteGroupsFriend.IdUser1 = group.id_user_1;
+                            sQLiteGroupsFriend.IdUser2 = group.id_user_2;
+                            if (sQLiteGroupsFriend.Create())
+                            {
+                                var json_otvet = new { code_status = true };
+                                output_text = JsonConvert.SerializeObject(json_otvet);
+                            }
+                            else
+                            {
+                                var json_otvet = new { code_status = false };
+                                output_text = JsonConvert.SerializeObject(json_otvet);
+                            }
+
+                        }
+                    }
+                    break;
                 default:    
                 {  
                     output_text = "__def_text_com__: " + tkh.GetArgumentCommand();   
