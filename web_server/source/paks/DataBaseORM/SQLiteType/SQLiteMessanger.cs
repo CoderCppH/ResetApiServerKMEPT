@@ -20,7 +20,7 @@ namespace web_server
 
         public static void CreateTable()
         {
-            string sqlCommand = $"CREATE TABLE IF NOT EXISTS {@nameTable} (id INTEGER PRIMARY KEY AUTOINCREMENT, message TEXT NOT NULL, time_send TEXT NOT NULL, id_sender_user INTEGER NOT NULL, id_group INTEGER NOT NULL, FOREIGN KEY (id_group) REFERENCES group_data(id) )";
+            string sqlCommand = $"CREATE TABLE IF NOT EXISTS {@nameTable} (id INTEGER PRIMARY KEY AUTOINCREMENT, message TEXT NOT NULL, time_send TEXT NOT NULL, id_my_user INTEGER NOT NULL, id_sender_user INTEGER NOT NULL, id_group INTEGER NOT NULL, FOREIGN KEY (id_group) REFERENCES group_data(id) )";
             using(SQLiteCommand command = new SQLiteCommand(sqlCommand, dataBase.GetConnection()))
                 command.ExecuteNonQuery();
         }
