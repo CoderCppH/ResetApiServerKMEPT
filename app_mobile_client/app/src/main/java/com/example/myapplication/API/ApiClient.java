@@ -34,9 +34,11 @@ public class ApiClient {
             in.close();
             return response.toString();
         } catch(Exception ex) {
-            ex.printStackTrace();
+            if(ex.getMessage() != null && ex.toString() != null) {
+                Log.d("API.POST.ERROR", ex.getMessage());
+            }
         }
-        return "";
+        return "error";
     }
     public String GET(String url) {
         try {

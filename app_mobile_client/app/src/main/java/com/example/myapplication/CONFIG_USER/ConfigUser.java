@@ -20,6 +20,9 @@ public class ConfigUser {
         this.context = context;
         file = new File(context.getFilesDir(), ConfigPath);
     }
+    public Boolean Delet() {
+        return file.delete();
+    }
     public sql_p_user get_user() {
         sql_p_user user = new sql_p_user();
         if(file != null && file.exists()) {
@@ -38,7 +41,7 @@ public class ConfigUser {
         else {
             user.id = -1;
             user.email = "NPU";
-            user.full_name = "NFNL";
+            user.fullname = "NFNL";
             try {
                 file.createNewFile();
                 edit_config_user(user);

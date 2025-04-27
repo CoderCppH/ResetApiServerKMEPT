@@ -36,6 +36,8 @@ class MainActivity : AppCompatActivity() {
         loop_rotation_img()
         et_email = findViewById(R.id.activity_main_edit_text_email)
         var user = ConfigUser(this).get_user();
+        var gson = Gson();
+        Log.d("Config.User", gson.toJson(user))
         if(user.id >= 0) {
             next_activity()
         }
@@ -106,17 +108,17 @@ class MainActivity : AppCompatActivity() {
                                 sql_p_user();
                             p_user.email = email_string
                             p_user.id = 0;
-                            p_user.full_name = "user_" + g_code
-
+                            p_user.fullname = "user_" + g_code
+                            p_user.password = "";
                             var gson = Gson();
 
                             var api = ApiClient();
-
+                            Log.d("Config.User", gson.toJson(p_user));
                             var res = api.POST(
                                 GL.url_api_server + "make_user",
                                 gson.toJson(p_user)
                             );
-
+                            Log.d("API.POST.MAKE_USER", res)
                             if (res.equals("{\"code_status\":true}")) {
                                 config_user.edit_config_user(p_user)
                                 next_activity()
@@ -124,13 +126,13 @@ class MainActivity : AppCompatActivity() {
                             else {
 
                                 config_user.edit_config_user(p_user)
-                                next_activity()
+                                //next_activity()
 
                                 res = api.POST(
                                     GL.url_api_server + "login_user",
                                     gson.toJson(p_user)
                                 );
-
+                                Log.d("API.POST.LOGIN_USER", res)
                                 if (res.equals("{\"code_status\":true}")) {
 
                                     config_user.edit_config_user(p_user)

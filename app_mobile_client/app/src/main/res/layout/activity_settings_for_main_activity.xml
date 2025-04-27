@@ -3,5 +3,12 @@
     android:background="@color/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+<Button
+    android:layout_margin="10dp"
+    android:backgroundTint="#F44336"
+    android:text="exit acc"
+    android:onClick="btn_exit_clicked"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+</Button>
 </LinearLayout>
