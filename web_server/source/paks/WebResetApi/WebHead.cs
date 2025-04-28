@@ -59,6 +59,7 @@ namespace web_server{
                 request = context.Request;
                 response = context.Response;
             }   catch {  }
+            Console.WriteLine($"URI: '{request.RawUrl}'");
             switch(request?.RawUrl){
                 case "/make_user":{
                     using(var input = request.InputStream){
@@ -80,6 +81,7 @@ namespace web_server{
                             }
                             else{
                                 var json_otvet = new { code_status = false };
+                                    Console.WriteLine($"json: {output_text}");
                                 output_text = JsonConvert.SerializeObject(json_otvet);
                             }
                         }
@@ -116,6 +118,7 @@ namespace web_server{
                                 output_text = JsonConvert.SerializeObject(json_otvet);
                             }
                         }
+                        Console.WriteLine($"json: {output_text}");
                     }
                 }break;
                 case "/make_cri":{
@@ -133,6 +136,7 @@ namespace web_server{
                             Console.WriteLine($"Зашифрованные данные: {Convert.ToBase64String(encrypted)}");
                             System.Console.WriteLine($"разхешифрованные данные: {WebAse.DecryptStringFromBytes_Aes(encrypted, aes.Key, aes.IV)}");
                             output_text = JsonConvert.SerializeObject(kiv);
+                            Console.WriteLine($"json: {output_text}");
                         }
                     }
                 }break;
