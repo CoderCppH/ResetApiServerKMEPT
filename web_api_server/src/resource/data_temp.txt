@@ -1,0 +1,23 @@
+ using (Orm.ExceCommand comm = new Orm.ExceCommand()) {
+        // comm.CreateTable("users", 
+        // "id INTEGER PRIMARY KEY AUTOINCREMENT, "+
+        // "first_name TEXT NOT NULL, " + 
+        // "last_name TEXT NOT NULL, " + 
+        // "email TEXT NOT NULL"
+        // );
+        Orm.Type.User user = new Orm.Type.User{ 
+                id = 0, 
+                first_name = "pargev", 
+                last_name = "nagapetyan", 
+                email = "pargev20002607@gmail.com"
+                };
+
+        comm.Insert(
+            "users", 
+            "first_name, last_name, email", 
+            "@first_name, @last_name, @email", 
+            user
+            );
+
+        return comm.SelecrFrom<Orm.Type.User>("users");
+    }

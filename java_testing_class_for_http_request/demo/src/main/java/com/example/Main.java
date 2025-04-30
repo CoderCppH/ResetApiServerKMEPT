@@ -11,11 +11,11 @@ import com.google.gson.Gson;
 public class Main {
     public static void main(String[] args) {
         System.out.println("Start");
-        String url_make_user = "http://127.0.0.1:8888/make_user";
-        String url_login_user = "http://127.0.0.1:8888/get_list_user";
-        sql_p_user user = new sql_p_user(0, "Pargev", "coder.cpp.h@gmail.com", "********");
+        String url = "http://127.0.0.1:5226/api/users/1";
+
         ApiClient api = new ApiClient();
-        //System.out.println(api.POST(url_make_user, new Gson().toJson(user)));
-        System.out.println(api.GET(url_login_user));
+        
+        System.out.println(api.GET(url));
+        
     }
 }
