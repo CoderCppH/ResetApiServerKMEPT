@@ -23,8 +23,8 @@ public class ConfigUser {
     public Boolean Delet() {
         return file.delete();
     }
-    public sql_p_user get_user() {
-        sql_p_user user = new sql_p_user();
+    public Person get_user() {
+        Person user = new Person();
         if(file != null && file.exists()) {
             String json;
             try {
@@ -36,12 +36,13 @@ public class ConfigUser {
                 throw new RuntimeException(e);
             }
             Gson gson = new Gson();
-            user = gson.fromJson(json, sql_p_user.class);
+            user = gson.fromJson(json, Person.class);
         }
         else {
             user.id = -1;
-            user.email = "NPU";
-            user.fullname = "NFNL";
+            user.first_name = "";
+            user.last_name = "";
+            user.email = "";
             try {
                 file.createNewFile();
                 edit_config_user(user);
@@ -51,7 +52,7 @@ public class ConfigUser {
         }
         return user;
     }
-    public void edit_config_user(sql_p_user user) {
+    public void edit_config_user(Person user) {
         try {
             FileOutputStream fileOutputStream = context.openFileOutput(ConfigPath, Context.MODE_PRIVATE);
             Gson gson = new Gson();

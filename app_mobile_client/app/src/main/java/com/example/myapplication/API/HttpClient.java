@@ -7,12 +7,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-public class ApiClient {
+public class HttpClient {
     public String POST(String url, String json) {
         try {
             URL obj = new URL(url);
             HttpURLConnection objConnectURL = (HttpURLConnection) obj.openConnection();
-
+            
             objConnectURL.setRequestMethod("POST");
             objConnectURL.setRequestProperty("Content-Type", "application/json");
             objConnectURL.setRequestProperty("Accept", "application/json");

@@ -1,8 +1,8 @@
 package com.example.myapplication.CONFIG_USER;
 
-public class sql_p_user {
+public class Person {
     public int id;
+    public String first_name;
+    public String last_name;
     public String email;
-    public String fullname;
-    public String password;
 }

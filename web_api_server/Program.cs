@@ -47,7 +47,7 @@ app.MapGet("/api/users/", ()=> {
 app.MapPost("/api/find_user/", 
     (User user)=> {
         using(ExceCommand comm = new ExceCommand()) {
-            return Results.Ok(comm.SelectFrom<Orm.Type.User>("users").FirstOrDefault(item=> item.email == item.email));
+            return Results.Ok(comm?.SelectFrom<Orm.Type.User>("users")?.Find(item=> item.email == user.email));
         }
     });
 //Get FIND USER FROM ID

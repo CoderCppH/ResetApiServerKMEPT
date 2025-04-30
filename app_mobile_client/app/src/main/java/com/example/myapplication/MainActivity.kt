@@ -11,9 +11,9 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.ACTIVITY.MainMenuActivity
-import com.example.myapplication.API.ApiClient
+import com.example.myapplication.API.HttpClient
 import com.example.myapplication.CONFIG_USER.ConfigUser
-import com.example.myapplication.CONFIG_USER.sql_p_user
+import com.example.myapplication.CONFIG_USER.Person
 import com.example.myapplication.GL.GL
 import com.example.myapplication.MAILSS.MailSs
 import com.example.myapplication.SETUP.SetUp
@@ -102,24 +102,22 @@ class MainActivity : AppCompatActivity() {
                         //Log.d("input_code", code.text.toString() + ", " + g_code.toString())
                         if (code.text.toString().equals(g_code)) {
                             Log.d("input_code", "SUCCESS")
+                            var p_user = Person();
+                            p_user.email = email_string;
 
                             var config_user = ConfigUser(this);
-                            var p_user =
-                                sql_p_user();
-                            p_user.email = email_string
-                            p_user.id = 0;
-                            p_user.fullname = "user_" + g_code
-                            p_user.password = "";
+
                             var gson = Gson();
 
-                            var api = ApiClient();
+                            var api = HttpClient();
                             Log.d("Config.User", gson.toJson(p_user));
                             var res = api.POST(
-                                GL.url_api_server + "make_user",
+                                GL.url_api_server + "users",
                                 gson.toJson(p_user)
                             );
-                            Log.d("API.POST.MAKE_USER", res)
-                            if (res.equals("{\"code_status\":true}")) {
+                            Log.d("API.POST.users", res)
+
+                            if (res.trim().equals("{\"message\": \"success inserts user\"}".trim())) {
                                 config_user.edit_config_user(p_user)
                                 next_activity()
                             }
@@ -129,11 +127,12 @@ class MainActivity : AppCompatActivity() {
                                 //next_activity()
 
                                 res = api.POST(
-                                    GL.url_api_server + "login_user",
+                                    GL.url_api_server + "find_user",
                                     gson.toJson(p_user)
                                 );
                                 Log.d("API.POST.LOGIN_USER", res)
-                                if (res.equals("{\"code_status\":true}")) {
+                                var person = gson.fromJson(res, Person::class.java)
+                                if (person.id > 0) {
 
                                     config_user.edit_config_user(p_user)
                                     next_activity()

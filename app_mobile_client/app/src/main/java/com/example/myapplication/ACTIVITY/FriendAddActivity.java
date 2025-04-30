@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.myapplication.API.ApiClient;
+import com.example.myapplication.API.HttpClient;
 import com.example.myapplication.API.json_p_user;
 import com.example.myapplication.GL.GL;
 import com.example.myapplication.LIST_USER.UserAdapter;
@@ -37,14 +37,14 @@ public class FriendAddActivity extends AppCompatActivity {
         new Thread(()->{
             ArrayList<p_user_item> list_user_adapter = new ArrayList<>();
             ArrayList<json_p_user> list_user = new ArrayList<>();
-            ApiClient api = new ApiClient();
-            var temp = api.GET( GL.url_api_server  + "get_list_user");
+            HttpClient api = new HttpClient();
+            var temp = api.GET( GL.url_api_server  + "users");
             Gson gson = new Gson();
             Type userListType = new TypeToken<List<json_p_user>>() {}.getType();
             list_user = gson.fromJson(temp, userListType);
             Log.d("API.GET.USERS", temp);
             for(var i : list_user){
-                list_user_adapter.add(new p_user_item(R.drawable.ic_launcher_foreground,i.FullName,i.Email));
+                list_user_adapter.add(new p_user_item(R.drawable.ic_launcher_foreground,i.first_name, i.email));
             }
             runOnUiThread(()->{
                 adapter = new UserAdapter(this.getLayoutInflater(), list_user_adapter);
