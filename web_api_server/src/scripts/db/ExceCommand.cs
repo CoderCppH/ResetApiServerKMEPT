@@ -22,8 +22,11 @@ namespace Orm {
             return false;
         }
         public bool Insert(string? tableName, string? args1, string? args2, object? data) {
-            if (connect?.GetConnection().Execute($"INSERT INTO {tableName} ({args1}) VALUES ({args2})", data) > 0)
-                return true; 
+            try{
+                if (connect?.GetConnection().Execute($"INSERT INTO {tableName} ({args1}) VALUES ({args2})", data) > 0)
+                    return true;
+            }
+            catch {} 
             return false;
         }
         public List<T>?SelectFrom<T>(string? tableName) {
