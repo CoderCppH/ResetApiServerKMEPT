@@ -32,11 +32,14 @@ public class FriendAddActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
         new SetUp(this);
+
         recyclerView = findViewById(R.id.recycle_view_friends_on_add);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         new Thread(()->{
             ArrayList<p_user_item> list_user_adapter = new ArrayList<>();
             ArrayList<json_p_user> list_user = new ArrayList<>();
+
             HttpClient api = new HttpClient();
             var temp = api.GET( GL.url_api_server  + "users");
             Gson gson = new Gson();
@@ -44,7 +47,7 @@ public class FriendAddActivity extends AppCompatActivity {
             list_user = gson.fromJson(temp, userListType);
             Log.d("API.GET.USERS", temp);
             for(var i : list_user){
-                list_user_adapter.add(new p_user_item(R.drawable.ic_launcher_foreground,i.first_name, i.email));
+                list_user_adapter.add(new p_user_item(R.drawable.ic_launcher_foreground, i.first_name, i.email));
             }
             runOnUiThread(()->{
                 adapter = new UserAdapter(this.getLayoutInflater(), list_user_adapter);

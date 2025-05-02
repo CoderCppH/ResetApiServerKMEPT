@@ -104,38 +104,40 @@ class MainActivity : AppCompatActivity() {
                             Log.d("input_code", "SUCCESS")
                             var p_user = Person();
                             p_user.email = email_string;
+                            p_user.first_name = "null"
+                            p_user.last_name = "null"
+                            p_user.id = -1
+
+                            //Log
 
                             var config_user = ConfigUser(this);
-
+                            var api = HttpClient();
                             var gson = Gson();
 
-                            var api = HttpClient();
-                            Log.d("Config.User", gson.toJson(p_user));
-                            var res = api.POST(
-                                GL.url_api_server + "users",
-                                gson.toJson(p_user)
-                            );
+                            var res = api.POST( GL.url_api_server + "users", gson.toJson(p_user) );
+
                             Log.d("API.POST.users", res)
+                            Log.d("Config.User", gson.toJson(p_user));
 
                             if (res.trim().equals("{\"message\": \"success inserts user\"}".trim())) {
                                 config_user.edit_config_user(p_user)
                                 next_activity()
+                                Log.d("REGISTER", "Success")
                             }
                             else {
-
                                 config_user.edit_config_user(p_user)
-                                //next_activity()
+                                res = api.POST(GL.url_api_server + "find_user", gson.toJson(p_user));
 
-                                res = api.POST(
-                                    GL.url_api_server + "find_user",
-                                    gson.toJson(p_user)
-                                );
+                                Log.d("LOGIN", "INIT")
                                 Log.d("API.POST.LOGIN_USER", res)
+
                                 var person = gson.fromJson(res, Person::class.java)
+
                                 if (person.id > 0) {
 
                                     config_user.edit_config_user(p_user)
                                     next_activity()
+                                    Log.d("LOGIN", "Success")
 
                                 } else {
                                     Toast.makeText(

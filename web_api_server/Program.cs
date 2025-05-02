@@ -47,7 +47,10 @@ app.MapGet("/api/users/", ()=> {
 app.MapPost("/api/find_user/", 
     (User user)=> {
         using(ExceCommand comm = new ExceCommand()) {
-            return Results.Ok(comm?.SelectFrom<Orm.Type.User>("users")?.Find(item=> item.email == user.email));
+            var found_user = (comm?.SelectFrom<Orm.Type.User>("users")?.Find(item=> item.email == user.email));
+            if (found_user == null)
+                return Results.NotFound(new {message = "user not found or null"});
+            return Results.Json(found_user);
         }
     });
 //Get FIND USER FROM ID
