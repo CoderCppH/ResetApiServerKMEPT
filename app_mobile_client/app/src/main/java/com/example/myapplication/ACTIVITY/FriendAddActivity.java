@@ -2,6 +2,7 @@ package com.example.myapplication.ACTIVITY;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +23,11 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.Dispatchers;
+import kotlinx.coroutines.GlobalScope;
+
+
 public class FriendAddActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -36,25 +42,50 @@ public class FriendAddActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycle_view_friends_on_add);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        new Thread(()->{
-            ArrayList<p_user_item> list_user_adapter = new ArrayList<>();
-            ArrayList<json_p_user> list_user = new ArrayList<>();
-
-            HttpClient api = new HttpClient();
-            var temp = api.GET( GL.url_api_server  + "users");
-            Gson gson = new Gson();
-            Type userListType = new TypeToken<List<json_p_user>>() {}.getType();
-            list_user = gson.fromJson(temp, userListType);
-            Log.d("API.GET.USERS", temp);
-            for(var i : list_user){
-                list_user_adapter.add(new p_user_item(R.drawable.ic_launcher_foreground, i.first_name, i.email));
-            }
-            runOnUiThread(()->{
-                adapter = new UserAdapter(this.getLayoutInflater(), list_user_adapter);
-                recyclerView.setAdapter(adapter);
-            });
-        }).start();
-
+        // Запускаем корутину для получения данных
+        fetchUsers();
     }
 
+    private void fetchUsers() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HttpClient api = new HttpClient();
+                    String response = api.GET(GL.url_api_server + "users");
+                    Log.d("API.GET.USERS", response);
+
+                    Gson gson = new Gson();
+                    Type userListType = new TypeToken<List<json_p_user>>() {}.getType();
+                    final List<json_p_user> userList = gson.fromJson(response, userListType);
+
+                    final ArrayList<p_user_item> adapterList = new ArrayList<>();
+                    for (json_p_user user : userList) {
+                        adapterList.add(new p_user_item(R.drawable.ic_launcher_foreground, user.first_name, user.email));
+                    }
+
+                    // Обновление UI
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isFinishing() && !isDestroyed()) {
+                                adapter = new UserAdapter(getLayoutInflater(), adapterList);
+                                recyclerView.setAdapter(adapter);
+                            } else {
+                                Log.w("FriendAddActivity", "Activity is finishing or destroyed, не обновляем UI");
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("FriendAddActivity", "Ошибка при загрузке пользователей", e);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(FriendAddActivity.this, "Ошибка загрузки данных", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
 }

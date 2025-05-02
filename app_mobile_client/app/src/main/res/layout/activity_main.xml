@@ -47,7 +47,7 @@
             android:textSize="20dp"></EditText>
 
         <Button
-            android:onClick="on_click_go_to"
+            android:onClick="onClickGoTo"
             android:textColor="@color/white"
             android:textSize="30dp"
             android:layout_marginTop="60dp"

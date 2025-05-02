@@ -27,6 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ACTIVITY.MessangerActivity"> </activity>
         <activity android:name=".ACTIVITY.SettingsActivity"> </activity>
         <activity android:name=".ACTIVITY.MainMenuActivity"> </activity>
         <activity android:name=".ACTIVITY.FriendAddActivity"> </activity>

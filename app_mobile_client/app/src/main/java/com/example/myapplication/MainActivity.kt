@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.animation.ValueAnimator
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
@@ -18,140 +19,159 @@ import com.example.myapplication.GL.GL
 import com.example.myapplication.MAILSS.MailSs
 import com.example.myapplication.SETUP.SetUp
 import com.google.gson.Gson
-import kotlin.concurrent.thread
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
-    lateinit var img:ImageView
-    lateinit var et_email:EditText
-    lateinit var g_code:String
+    private lateinit var img: ImageView
+    private lateinit var et_email: EditText
+    private lateinit var g_code: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Init();
+        init()
     }
-    private fun Init() {
+
+    private fun init() {
         SetUp(this)
         img = findViewById(R.id.img_V)
-        loop_rotation_img()
+        loopRotationImg()
         et_email = findViewById(R.id.activity_main_edit_text_email)
-        var user = ConfigUser(this).get_user();
-        var gson = Gson();
+        val user = ConfigUser (this).get_user()
+        val gson = Gson()
         Log.d("Config.User", gson.toJson(user))
-        if(user.id >= 0) {
-            next_activity()
+        if (user.id >= 0) {
+            nextActivity()
         }
-
     }
-    private fun loop_rotation_img() {
-        thread(){
-            var y:Double = 0.0
-            while (true)
-            {
-                rotation_img(y)
-                y++
-                Thread.sleep(20)
+
+    private fun loopRotationImg() {
+        val animator = ValueAnimator.ofFloat(0f, 360f).apply {
+            duration = 2000
+            repeatCount = ValueAnimator.INFINITE
+            addUpdateListener { animation ->
+                val value = animation.animatedValue as Float
+                img.rotationY = value
+                img.rotationX = value
             }
         }
+        animator.start()
     }
-    private fun rotation_img(y_float:Double)  {
-        img.rotationY = y_float.toFloat();
-        img.rotationX = y_float.toFloat();
+
+    private fun generatorCode(): String {
+        val alpha = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890"
+        return (1..6).map { alpha[Random.nextInt(alpha.length)] }.joinToString("")
     }
-    private fun generatorCode():String {
-        var code = ""
-        var alpha = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890"
-        for (i:Int in 0..5) {
-            var c_rand_alpha = alpha[Random.nextInt(0, alpha.length-1)]
-            code+= c_rand_alpha;
-        }
-        return code
+
+    private fun checkGmailIndex(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
-    fun check_gmail_index(email:String):Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email.toString()).matches()
-    }
-    private fun next_activity() {
+
+    private fun nextActivity() {
         finishAffinity()
-        var intent = Intent(this, MainMenuActivity::class.java)
+        val intent = Intent(this, MainMenuActivity::class.java)
         startActivity(intent)
     }
-    public fun on_click_go_to(view:View) {
-        var email_string = et_email.text.toString()
-        if(check_gmail_index(email_string)) {
-            thread () {
-                var email_sender = MailSs()
+
+    public fun onClickGoTo(view: View) {
+        val emailString = et_email.text.toString()
+        if (checkGmailIndex(emailString)) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val emailSender = MailSs()
                 g_code = generatorCode()
-                var body_text = "только ни кому не сообщай об этом коде !!! \n code: ${g_code}"
-                var head_text = "очень важный код от ChatLink"
-                runOnUiThread {
-                    Toast.makeText(this, email_string, Toast.LENGTH_SHORT).show()
+                val bodyText = "только ни кому не сообщай об этом коде !!! \n code: $g_code"
+                val headText = "очень важный код от ChatLink"
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, emailString, Toast.LENGTH_SHORT).show()
                 }
-                email_sender.sendMessage(body_text, head_text, email_string);
-                var code:EditText = EditText(this);
-                var btn:Button = Button(this);
-                runOnUiThread {
-                    var dialog: Dialog = Dialog(this);
-                    dialog.setTitle("CODE");
-                    dialog.setContentView(R.layout.dialog_activity);
-                    code = dialog.findViewById(R.id.dialog_edit_text_code)
-                    btn = dialog.findViewById(R.id.dialog_confirm_code_btn)
-                    dialog.show()
-                }
-                runOnUiThread {
-                    btn.setOnClickListener({
-                        //Log.d("input_code", code.text.toString() + ", " + g_code.toString())
-                        if (code.text.toString().equals(g_code)) {
-                            Log.d("input_code", "SUCCESS")
-                            var p_user = Person();
-                            p_user.email = email_string;
-                            p_user.first_name = "null"
-                            p_user.last_name = "null"
-                            p_user.id = -1
 
-                            //Log
+                emailSender.sendMessage(bodyText, headText, emailString)
+                showCodeDialog(emailString)
+            }
+        } else {
+            Toast.makeText(this, "Введите корректный email", Toast.LENGTH_SHORT).show()
+        }
+    }
 
-                            var config_user = ConfigUser(this);
-                            var api = HttpClient();
-                            var gson = Gson();
+    private fun showCodeDialog(emailString: String) {
+        // Переключаемся на основной поток для создания диалога
+        CoroutineScope(Dispatchers.Main).launch {
+            val dialog = Dialog(this@MainActivity)
+            dialog.setTitle("CODE")
+            dialog.setContentView(R.layout.dialog_activity)
 
-                            var res = api.POST( GL.url_api_server + "users", gson.toJson(p_user) );
+            val codeEditText: EditText = dialog.findViewById(R.id.dialog_edit_text_code)
+            val confirmButton: Button = dialog.findViewById(R.id.dialog_confirm_code_btn)
 
+            confirmButton.setOnClickListener {
+                val inputCode = codeEditText.text.toString()
+                if (inputCode == g_code) {
+                    Log.d("input_code", "SUCCESS")
+                    val pUser  = Person().apply {
+                        email = emailString
+                        first_name = "null"
+                        last_name = "null"
+                        id = -1
+                    }
+
+                    val configUser  = ConfigUser (this@MainActivity)
+                    val api = HttpClient()
+                    val gson = Gson()
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val res = api.POST(GL.url_api_server + "users", gson.toJson(pUser ))
                             Log.d("API.POST.users", res)
-                            Log.d("Config.User", gson.toJson(p_user));
+                            Log.d("Config.User", gson.toJson(pUser ))
 
-                            if (res.trim().equals("{\"message\": \"success inserts user\"}".trim())) {
-                                config_user.edit_config_user(p_user)
-                                next_activity()
+                            if (res.trim() == "{\"message\": \"success inserts user\"}") {
+                                configUser .edit_config_user(pUser )
+                                withContext(Dispatchers.Main) {
+                                    nextActivity()
+                                }
                                 Log.d("REGISTER", "Success")
-                            }
-                            else {
-                                config_user.edit_config_user(p_user)
-                                res = api.POST(GL.url_api_server + "find_user", gson.toJson(p_user));
-
+                            } else {
+                                configUser .edit_config_user(pUser )
+                                val loginRes = api.POST(GL.url_api_server + "find_user", gson.toJson(pUser ))
                                 Log.d("LOGIN", "INIT")
-                                Log.d("API.POST.LOGIN_USER", res)
-
-                                var person = gson.fromJson(res, Person::class.java)
-
-                                if (person.id > 0) {
-
-                                    config_user.edit_config_user(p_user)
-                                    next_activity()
-                                    Log.d("LOGIN", "Success")
-
-                                } else {
-                                    Toast.makeText(
-                                        this,
-                                        "хмм где-то ошибка: " + res.toString(),
-                                        Toast.LENGTH_SHORT
-                                    ).show();
-
+                                Log.d("API.POST.LOGIN_USER", loginRes)
+                                val person = gson.fromJson(loginRes, Person::class.java)
+                                withContext(Dispatchers.Main) {
+                                    if (person.id > 0) {
+                                        configUser .edit_config_user(person)
+                                        nextActivity()
+                                        Log.d("LOGIN", "Success")
+                                    } else {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            "хмм где-то ошибка: $loginRes",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Произошла ошибка: ${e.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            Log.e("API.Error", e.toString())
                         }
-                    })
+                    }
+                    dialog.dismiss()
+                } else {
+                    Toast.makeText(this@MainActivity, "Неверный код", Toast.LENGTH_SHORT).show()
                 }
             }
+            dialog.show()
         }
     }
 }
