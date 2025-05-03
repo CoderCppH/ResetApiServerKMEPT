@@ -50,6 +50,7 @@ public class FrindaListFragment extends Fragment {
         adapter.setOnItemClickListener(position -> {
             p_user_item clickedItem = list.get(position);
             var intent_mess = new Intent(view.getContext(), MessangerActivity.class);
+            intent_mess.putExtra("person_json",new Gson().toJson(clickedItem));
             startActivity(intent_mess);
         });
 
@@ -73,7 +74,7 @@ public class FrindaListFragment extends Fragment {
                 List<json_p_user> userList = gson.fromJson(response, userListType);
 
                 for (json_p_user user : userList) {
-                    p_user_item p_usr = new p_user_item(
+                    p_user_item p_usr = new p_user_item(user.id,
                             R.drawable.ic_launcher_foreground,
                             user.first_name + " " + user.last_name,
                             user.email);

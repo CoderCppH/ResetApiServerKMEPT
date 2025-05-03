@@ -61,7 +61,7 @@ public class FriendAddActivity extends AppCompatActivity {
 
                     final ArrayList<p_user_item> adapterList = new ArrayList<>();
                     for (json_p_user user : userList) {
-                        adapterList.add(new p_user_item(R.drawable.ic_launcher_foreground, user.first_name, user.email));
+                        adapterList.add(new p_user_item(user.id, R.drawable.ic_launcher_foreground, user.first_name, user.email));
                     }
 
                     // Обновление UI

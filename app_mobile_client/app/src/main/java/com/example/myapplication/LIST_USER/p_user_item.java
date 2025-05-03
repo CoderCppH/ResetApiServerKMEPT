@@ -1,9 +1,11 @@
 package com.example.myapplication.LIST_USER;
 
 public class p_user_item {
+    int id;
     int image;
     String fullname, email;
-    public p_user_item(int image, String fullname, String email) {
+    public p_user_item(int id,int image, String fullname, String email) {
+        this.id = id;
         this.image = image;
         this.fullname = fullname;
         this.email = email;
@@ -16,5 +18,8 @@ public class p_user_item {
     }
     public String getEmail() {
         return this.email;
+    }
+    public int getId() {
+        return  this.id;
     }
 }

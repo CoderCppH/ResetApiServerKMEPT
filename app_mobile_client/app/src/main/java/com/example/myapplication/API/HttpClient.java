@@ -10,10 +10,35 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public class HttpClient {
 
-    public String POST(String url, String json) {
-        return executeRequest(url, "POST", json);
+    public String POST(String url, String jsonInputString) throws IOException {
+        // Создаем JSON-объект
+        OkHttpClient client = new OkHttpClient();
+        RequestBody body = RequestBody.create(
+                jsonInputString,
+                MediaType.parse("application/json; charset=utf-8")
+        );
+
+        // Создаем запрос
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        // Выполняем запрос
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+            // Возвращаем ответ в виде строки
+            return response.body().string();
+        }
     }
 
     public String PUT(String url, String json) {
@@ -33,7 +58,7 @@ public class HttpClient {
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
 
             int responseCode = connection.getResponseCode();
-            Log.d("RESPONSE_CODE", String.valueOf(responseCode));
+            Log.d("RESPONSE_CODE_METHOD_GET", String.valueOf(responseCode));
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 return readResponse(connection);
@@ -57,7 +82,6 @@ public class HttpClient {
             connection = (HttpURLConnection) obj.openConnection();
             connection.setRequestMethod(method);
             connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
             connection.setDoOutput(true);
 
             if (json != null) {
@@ -68,11 +92,11 @@ public class HttpClient {
             }
 
             int responseCode = connection.getResponseCode();
-            Log.d("RESPONSE_CODE", String.valueOf(responseCode));
+            Log.d("RESPONSE_CODE_METHOD_" + method.toString() , String.valueOf(responseCode) );
 
             return readResponse(connection);
         } catch (Exception ex) {
-            Log.d("API." + method + ".ERROR", ex.getMessage());
+            //Log.d("API." + method + ".ERROR", ex.getMessage());
         } finally {
             if (connection != null) {
                 connection.disconnect();
