@@ -118,9 +118,25 @@ public class MessangerActivity extends AppCompatActivity {
                     }
 
                     runOnUiThread(() -> {
-                        adapter = new MessageAdapter(messages);
-                        listView.setAdapter(adapter);
-                        listView.setSelection(adapter.getCount() - 1);
+                        // Проверяем, находится ли пользователь внизу списка (с запасом в 1 элемент)
+                        int lastVisiblePosition = listView.getLastVisiblePosition();
+                        int count = adapter == null ? 0 : adapter.getCount();
+
+                        boolean isAtBottom = (lastVisiblePosition >= count - 2);
+
+                        if (adapter == null) {
+                            adapter = new MessageAdapter(messages);
+                            listView.setAdapter(adapter);
+                        } else {
+                            adapter.clear();
+                            adapter.addAll(messages);
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        if (isAtBottom) {
+                            listView.setSelection(adapter.getCount() - 1);
+                        }
+                        // Если не внизу, то не прокручиваем, чтобы пользователь мог читать старые сообщения
                     });
                 } else {
                     Log.e("MessangerActivity", "Response from server is null");
@@ -162,6 +178,7 @@ public class MessangerActivity extends AppCompatActivity {
         stopRefreshingMessages(); // останавливаем, когда экран неактивен
     }
     public void OnButtonClickSendMessage(View view) {
+
         EditText messageEditText = findViewById(R.id.message_id_send_text);
         String text = messageEditText.getText().toString().trim();
 
@@ -204,13 +221,20 @@ public class MessangerActivity extends AppCompatActivity {
                         if ("{\"message\": \"success inserts messagers\"}".equals(finalRes)) {
                             // После успешной отправки обновляем список сообщений
                             loadMessagesFromServer();
+                            // Проверяем, находится ли пользователь внизу списка
+                            if (listView.getLastVisiblePosition() >= adapter.getCount() - 1) {
+                                listView.setSelection(adapter.getCount() - 1); // Прокручиваем вниз, если пользователь внизу
+                            }
                         } else {
                             Log.e("MessangerActivity", "Failed to send message: " + finalRes);
                         }
                     }
+                    listView.setSelection(adapter.getCount() - 1);
                 });
-                loadMessagesFromServer();
+
+
             }).start();
+
         }
     }
 }
