@@ -17,8 +17,9 @@ public class Main {
         System.out.println("Start");
         Gson gson = new Gson();
         String url = "http://185.159.129.187:5226/api/messagers/9/11";
-
+        
         ApiClient api = new ApiClient();
+        
         var type = new TypeToken<ArrayList<Message>>(){}.getType();
         var request = api.GET(url);
         System.out.println(request);
@@ -27,7 +28,6 @@ public class Main {
             for (var item : list_message) {
                 System.out.println(item.message);
             }
-
         }
         
         

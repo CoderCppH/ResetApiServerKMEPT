@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "csharp_testing_client_for_http_request/1.0.0": {
+        "runtime": {
+          "csharp_testing_client_for_http_request.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "csharp_testing_client_for_http_request/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

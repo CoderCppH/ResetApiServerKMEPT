@@ -22,11 +22,15 @@ namespace Orm {
             return false;
         }
         public bool Insert(string? tableName, string? args1, string? args2, object? data) {
-            try{
+            try
+            {
                 if (connect?.GetConnection().Execute($"INSERT INTO {tableName} ({args1}) VALUES ({args2})", data) > 0)
                     return true;
             }
-            catch {} 
+            catch (Exception e)
+            {
+                System.Console.WriteLine("ErrorInsertSql: {0} ", e.Message);
+            } 
             return false;
         }
         public List<T>?SelectFrom<T>(string? tableName) {
@@ -37,7 +41,7 @@ namespace Orm {
                 return true;
             return false;
         }
-        public bool Drop(string? tableName, string argq1, object data) {
+        public bool Delete(string? tableName, string argq1, object data) {
             if (connect?.GetConnection().Execute($"DELETE FROM {tableName} WHERE {argq1}", data) > 0)
                 return true;
             return false;

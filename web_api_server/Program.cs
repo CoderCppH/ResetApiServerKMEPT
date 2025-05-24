@@ -5,8 +5,6 @@ using Orm.Type;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -18,32 +16,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-//Get List<Temp>
-app.MapGet("/weatherforecast", () => {
-    
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
 //Get List<User>
 app.MapGet("/api/users/", ()=> {
     using (Orm.ExceCommand comm = new Orm.ExceCommand()) 
     {
         return comm.SelectFrom<Orm.Type.User>("users");
-
     }
 });
 app.MapPost("/api/find_user/", 
@@ -68,7 +45,6 @@ app.MapGet("/api/users/{id}", (int id)=> {
             return Results.Json(user);
         }
     });
-
 //POST REGISTER USER
 app.MapPost("/api/users/",
     (User user)=> {
@@ -83,7 +59,6 @@ app.MapPost("/api/users/",
             else return Results.Json(new {message = "failed insert user"});
         }
     });
-
 //UPDATE USER FROM ID
 app.MapPut("/api/users/", (User user)=> {
     using (Orm.ExceCommand comm = new Orm.ExceCommand()) {
@@ -101,18 +76,15 @@ app.MapPut("/api/users/", (User user)=> {
         
     }
 });
-
 //DELETE USER
 app.MapDelete("/api/users/{id}", (int id)=> {
     using (Orm.ExceCommand comm = new ExceCommand()) {
-        bool state = comm.Drop("users", 
+        bool state = comm.Delete("users", 
         "id = @id", new User() { id = id } );
         if(state)   return Results.Json(new {message = "success deleted user"});
         else return Results.Json(new {message = "failed delete user"});
     } 
 });
-
-
 ///Message
 app.MapGet("/api/messagers/",
     ()=>{
@@ -121,8 +93,6 @@ app.MapGet("/api/messagers/",
             return comm.SelectFrom<Orm.Type.Message>("messagers");
         }
     });
-
-
 //INSERT MESSAGE
 app.MapPost("/api/messagers/",
     (Message message)=> {
@@ -161,10 +131,88 @@ app.MapGet("/api/messagers/{id_user_from}/{id_user_to}",
             return Results.Ok(filteredMessages);
         }
     });
+//Lenta 
+app.MapGet("/api/lenta/",
+    () =>{
+        using (Orm.ExceCommand comm = new ExceCommand())
+        {
+            return comm.SelectFrom<Orm.Type.Lenta>("lenta_tables");
+        }
+    });
+app.MapPost("/api/lenta/", 
+    (Lenta lenta) => {
+        using (ExceCommand comm = new ExceCommand())
+        {
+            if (lenta.image_post.Equals("1"))
+            {
+                var img_array_bytes = File.ReadAllBytes(".\\src\\resource\\imgs\\empty.jpg");
+                var base_64_image = System.Convert.ToBase64String(img_array_bytes);
+                lenta.image_post = base_64_image;
+            }
 
+            bool state = comm.Insert(
+                "lenta_tables",
+                "name_post, description_post, image_post, id_user",
+                "@name_post, @description_post, @image_post, @id_user",
+                lenta);
+
+            if (state) return Results.Json(new { message = "success inserts lenta" });
+            else return Results.Json(new { message = "failed insert lenta" });
+        }
+    });
+app.MapGet("/api/lenta/{id_lenta}",
+    (int id_lenta) =>
+    { 
+        using (Orm.ExceCommand comm = new ExceCommand()) {
+                var list_message = comm.SelectFrom<Orm.Type.Lenta>("lenta_tables");
+                return Results.Ok(list_message?.Where(item=> item.id == id_lenta));
+            }
+    });
+app.MapPut("/api/lenta/",
+    (Lenta lenta)=>
+    {
+        using (ExceCommand comm = new ExceCommand())
+        {
+            bool state = false;
+            if (lenta.image_post.Equals("1"))
+            {
+                state = comm.Update(
+                "lenta_tables",
+                "name_post = @name_post, " +
+                "description_post = @description_post",
+                "id = @id",
+                lenta);
+            }
+            else
+            {
+                state = comm.Update(
+                "lenta_tables",
+                "name_post = @name_post, " +
+                "description_post = @description_post, " +
+                "image_post = @image_post",
+                "id = @id",
+                lenta);
+            }
+            
+
+            if(state)   return Results.Json(new {message = "success updates lenta"});
+            else return Results.Json(new {message = "failed update lenta"});
+        }
+    });
+app.MapDelete("/api/lenta/{id_lenta}",
+    (int id_lenta) =>
+    {
+        using (ExceCommand comm = new ExceCommand())
+        {
+            bool state = comm.Delete(
+                "lenta_tables",
+                "id = @id",
+                new Lenta() { id = id_lenta, description_post = "", name_post = "", id_user = 0, image_post = "" });
+
+            if(state)   return Results.Json(new {message = "success deleted lenta"});
+            else return Results.Json(new {message = "failed delete lenta"});
+        }
+       
+    });
 
 app.Run();
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
