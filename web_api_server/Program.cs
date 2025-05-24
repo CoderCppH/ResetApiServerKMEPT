@@ -212,7 +212,6 @@ app.MapDelete("/api/lenta/{id_lenta}",
             if(state)   return Results.Json(new {message = "success deleted lenta"});
             else return Results.Json(new {message = "failed delete lenta"});
         }
-       
     });
 
 app.Run();
