@@ -2,117 +2,87 @@ package com.example.myapplication.API;
 
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.ProtocolException;
-import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 public class HttpClient {
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private final OkHttpClient client;
 
-    public String POST(String url, String jsonInputString) throws IOException {
-        // Создаем JSON-объект
-        OkHttpClient client = new OkHttpClient();
-        RequestBody body = RequestBody.create(
-                jsonInputString,
-                MediaType.parse("application/json; charset=utf-8")
-        );
+    public HttpClient() {
+        // Настройка логгирования (только для debug)
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        // Создаем запрос
+        // Создаем клиент с настройками таймаутов
+        this.client = new OkHttpClient.Builder()
+                .connectTimeout(60, TimeUnit.SECONDS)  // Таймаут подключения
+                .readTimeout(60, TimeUnit.SECONDS)     // Таймаут чтения
+                .writeTimeout(60, TimeUnit.SECONDS)    // Таймаут записи
+                .addInterceptor(loggingInterceptor)     // Логгирование запросов/ответов
+                .build();
+    }
+
+    public String POST(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(json, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
                 .build();
 
-        // Выполняем запрос
+        return executeRequest(request);
+    }
+
+    public String PUT(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(json, JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .put(body)
+                .build();
+
+        return executeRequest(request);
+    }
+
+    public String DELETE(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .delete()
+                .build();
+
+        return executeRequest(request);
+    }
+
+    public String GET(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .build();
+
+        return executeRequest(request);
+    }
+
+    private String executeRequest(Request request) throws IOException {
         try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+            if (!response.isSuccessful()) {
+                throw new IOException("HTTP error code: " + response.code() +
+                        ", message: " + response.message());
+            }
 
-            // Возвращаем ответ в виде строки
-            return response.body().string();
+            String responseBody = response.body() != null ? response.body().string() : "";
+            Log.d("HTTP_RESPONSE", "Response from " + request.method() + " " + request.url() +
+                    ": " + responseBody);
+
+            return responseBody;
+        } catch (IOException e) {
+            Log.e("HTTP_ERROR", "Error in " + request.method() + " " + request.url(), e);
+            throw e;
         }
-    }
-
-    public String PUT(String url, String json) {
-        return executeRequest(url, "PUT", json);
-    }
-
-    public String DELETE(String url) {
-        return executeRequest(url, "DELETE", null);
-    }
-
-    public String GET(String url) {
-        HttpURLConnection connection = null;
-        try {
-            URL obj = new URL(url);
-            connection = (HttpURLConnection) obj.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
-
-            int responseCode = connection.getResponseCode();
-            Log.d("RESPONSE_CODE_METHOD_GET", String.valueOf(responseCode));
-
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                return readResponse(connection);
-            } else {
-                Log.d("API.GET.ERROR", "Response Code: " + responseCode);
-            }
-        } catch (Exception ex) {
-            Log.d("API.GET.ERROR", ex.getMessage());
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-        return "error_get";
-    }
-
-    private String executeRequest(String url, String method, String json) {
-        HttpURLConnection connection = null;
-        try {
-            URL obj = new URL(url);
-            connection = (HttpURLConnection) obj.openConnection();
-            connection.setRequestMethod(method);
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
-
-            if (json != null) {
-                try (OutputStream os = connection.getOutputStream()) {
-                    byte[] input = json.getBytes("utf-8");
-                    os.write(input, 0, input.length);
-                }
-            }
-
-            int responseCode = connection.getResponseCode();
-            Log.d("RESPONSE_CODE_METHOD_" + method.toString() , String.valueOf(responseCode) );
-
-            return readResponse(connection);
-        } catch (Exception ex) {
-            //Log.d("API." + method + ".ERROR", ex.getMessage());
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-        return "error_" + method.toLowerCase();
-    }
-
-    private String readResponse(HttpURLConnection connection) throws IOException {
-        StringBuilder response = new StringBuilder();
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-        }
-        return response.toString();
     }
 }

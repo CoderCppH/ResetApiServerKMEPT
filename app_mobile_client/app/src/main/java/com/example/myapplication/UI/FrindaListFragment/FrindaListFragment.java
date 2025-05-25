@@ -74,10 +74,13 @@ public class FrindaListFragment extends Fragment {
                 List<json_p_user> userList = gson.fromJson(response, userListType);
 
                 for (json_p_user user : userList) {
-                    p_user_item p_usr = new p_user_item(user.id,
-                            R.drawable.ic_launcher_foreground,
-                            user.first_name + " " + user.last_name,
-                            user.email);
+                    p_user_item p_usr = new p_user_item
+                            (
+                                    user.id,
+                                    R.drawable.ic_launcher_foreground,
+                                    user.first_name + " " + user.last_name,
+                                    user.email
+                            );
                     list.add(p_usr);
                 }
 

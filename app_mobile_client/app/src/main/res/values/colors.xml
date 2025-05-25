@@ -4,4 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="background">#212121</color>
     <color name="Tint">#94000000</color>
+
+    <color name="post_body">#424242</color>
+    <color name="post_title">#212121</color>
 </resources>

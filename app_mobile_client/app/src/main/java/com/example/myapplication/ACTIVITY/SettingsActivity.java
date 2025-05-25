@@ -18,6 +18,8 @@ import com.example.myapplication.R;
 import com.example.myapplication.SETUP.SetUp;
 import com.google.gson.Gson;
 
+import java.io.IOException;
+
 public class SettingsActivity extends AppCompatActivity {
     EditText first_name;
     EditText last_name;
@@ -55,7 +57,12 @@ public class SettingsActivity extends AppCompatActivity {
                 public void run() {
                     Gson gson = new Gson();
 
-                    var res = client.PUT(GL.url_api_server + "users", gson.toJson(person));
+                    String res = null;
+                    try {
+                        res = client.PUT(GL.url_api_server + "users", gson.toJson(person));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     if (res.equals("{\"message\":\"success updates user\"}")) {
                         config.edit_config_user(person);
                     }
@@ -69,7 +76,12 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 String uri = String.format( GL.url_api_server + "users/%d", person.id);
-                var res = client.DELETE(uri);
+                String res = null;
+                try {
+                    res = client.DELETE(uri);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
                 if(res.equals("{\"message\":\"success deleted user\"}")){
                     runOnUiThread(new Runnable() {

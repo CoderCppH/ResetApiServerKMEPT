@@ -28,6 +28,7 @@
             android:layout_height="50dp"
             app:cardCornerRadius="100dp">
                 <ImageButton
+                    android:id="@+id/btn_add_post"
                     android:background="@color/white"
                     android:src="@drawable/baseline_add_circle_24"
                     android:layout_gravity="center"
