@@ -58,9 +58,17 @@
               "target": "Package",
               "version": "[9.0.0, )"
             },
+            "SixLabors.ImageSharp": {
+              "target": "Package",
+              "version": "[3.1.8, )"
+            },
             "System.Data.SQLite": {
               "target": "Package",
               "version": "[1.0.119, )"
+            },
+            "System.Drawing.Common": {
+              "target": "Package",
+              "version": "[9.0.5, )"
             }
           },
           "imports": [

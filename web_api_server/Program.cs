@@ -136,7 +136,9 @@ app.MapGet("/api/lenta/",
     () =>{
         using (Orm.ExceCommand comm = new ExceCommand())
         {
-            return comm.SelectFrom<Orm.Type.Lenta>("lenta_tables");
+            var list = comm.SelectFrom<Orm.Type.Lenta>("lenta_tables");
+            list.ForEach(x => x.image_post = Pack.ImagePk.ImageCompressor.CompressBase64Image(x.image_post));
+            return Results.Ok(list);
         }
     });
 app.MapPost("/api/lenta/", 
@@ -145,7 +147,7 @@ app.MapPost("/api/lenta/",
         {
             if (lenta.image_post.Equals("1"))
             {
-                var img_array_bytes = File.ReadAllBytes(".\\src\\resource\\imgs\\empty.jpg");
+                var img_array_bytes = File.ReadAllBytes("./src/resource/imgs/empty.jpg");
                 var base_64_image = System.Convert.ToBase64String(img_array_bytes);
                 lenta.image_post = base_64_image;
             }
@@ -164,8 +166,9 @@ app.MapGet("/api/lenta/{id_lenta}",
     (int id_lenta) =>
     { 
         using (Orm.ExceCommand comm = new ExceCommand()) {
-                var list_message = comm.SelectFrom<Orm.Type.Lenta>("lenta_tables");
-                return Results.Ok(list_message?.Where(item=> item.id == id_lenta));
+                var list_lenta = comm.SelectFrom<Orm.Type.Lenta>("lenta_tables");
+                list_lenta.ForEach(x => x.image_post = Pack.ImagePk.ImageCompressor.CompressBase64Image(x.image_post));
+                return Results.Ok(list_lenta?.FirstOrDefault(item => item.id == id_lenta));
             }
     });
 app.MapPut("/api/lenta/",
