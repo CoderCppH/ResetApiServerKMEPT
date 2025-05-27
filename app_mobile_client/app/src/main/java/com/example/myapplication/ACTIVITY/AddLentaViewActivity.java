@@ -44,6 +44,8 @@ public class AddLentaViewActivity extends AppCompatActivity {
     private ImageView postImageView;
     private CheckBox useDefaultImageCheckBox;
     private Bitmap selectedImageBitmap;
+    private json_p_lenta lenta_json;
+    private Boolean EditPost;
 
     private String createPostWithImage(Bitmap image) {
         // 1. Сжимаем изображение
@@ -66,7 +68,10 @@ public class AddLentaViewActivity extends AppCompatActivity {
 
     private ProgressDialog showProgressDialog() {
         ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setMessage("Отправка поста...");
+        if (!EditPost)
+            dialog.setMessage("Отправка поста...");
+        else
+            dialog.setMessage("Изминение поста...");
         dialog.setCancelable(false);
         dialog.show();
         return dialog;
@@ -78,14 +83,9 @@ public class AddLentaViewActivity extends AppCompatActivity {
 
     private void handleResponse(String response) {
         try {
-            JSONObject json = new JSONObject(response);
-            if (json.getBoolean("success")) {
-                Toast.makeText(this, "Пост успешно создан!", Toast.LENGTH_SHORT).show();
-                finish();
-            } else {
-                showError(json.getString("message"));
-            }
-        } catch (JSONException e) {
+            Toast.makeText(this, response, Toast.LENGTH_SHORT).show();
+            finish();
+        } catch (Exception e) {
             showError("Неверный формат ответа сервера");
         }
     }
@@ -107,6 +107,10 @@ public class AddLentaViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_lenta_view);
         new SetUp(this);
 
+        EditPost = getIntent().getBooleanExtra("edit_post", false);
+
+
+
         // Инициализация views
         namePostEditText = findViewById(R.id.namePostEditText);
         descriptionPostEditText = findViewById(R.id.descriptionPostEditText);
@@ -114,6 +118,27 @@ public class AddLentaViewActivity extends AppCompatActivity {
         useDefaultImageCheckBox = findViewById(R.id.useDefaultImageCheckBox);
         Button selectImageButton = findViewById(R.id.selectImageButton);
         Button createPostButton = findViewById(R.id.createPostButton);
+
+        if (EditPost)
+        {
+            createPostButton.setText("Изменить Пост");
+            String json = getIntent().getStringExtra("json_lenta");
+            lenta_json = new Gson().fromJson(json, json_p_lenta.class);
+            namePostEditText.setText(lenta_json.name_post);
+            descriptionPostEditText.setText(lenta_json.description_post);
+            try {
+                byte[] decodedBytes = Base64.decode(lenta_json.image_post, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                postImageView.setImageBitmap(bitmap);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+        }
+        else
+            lenta_json = new json_p_lenta();
 
         // Обработчик для кнопки выбора изображения
         selectImageButton.setOnClickListener(v -> {
@@ -174,23 +199,27 @@ public class AddLentaViewActivity extends AppCompatActivity {
             showError("Заполните все поля");
             return;
         }
-
+            preparePostData(namePost, descriptionPost);
         // Подготовка данных
-        json_p_lenta postData = preparePostData(namePost, descriptionPost);
+        json_p_lenta postData = lenta_json;
         if (postData == null) return;
 
         // Отправка с индикатором прогресса
         ProgressDialog progressDialog = showProgressDialog();
 
         new Thread(() -> {
+
             try {
                 HttpClient httpClient = new HttpClient();
-                String response = httpClient.POST(GL.url_api_server + "lenta",
-                        new Gson().toJson(postData));
-
+                String response = "";
+                if (!EditPost)
+                        response = httpClient.POST(GL.url_api_server + "lenta", new Gson().toJson(postData));
+                else
+                        response = httpClient.PUT(GL.url_api_server + "lenta", new Gson().toJson(postData));
+                String finalResponse = response;
                 runOnUiThread(() -> {
                     progressDialog.dismiss();
-                    handleResponse(response);
+                    handleResponse(finalResponse);
                 });
             } catch (IOException e) {
                 runOnUiThread(() -> {
@@ -202,26 +231,25 @@ public class AddLentaViewActivity extends AppCompatActivity {
         }).start();
     }
 
-    private json_p_lenta preparePostData(String name, String desc) {
-        json_p_lenta post = new json_p_lenta();
-        post.name_post = name;
-        post.description_post = desc;
-        post.id_user = new ConfigUser(this).get_user().id;
+    private void preparePostData(String name, String desc) {
+        lenta_json.name_post = name;
+        lenta_json.description_post = desc;
+        lenta_json.id_user = new ConfigUser(this).get_user().id;
 
         if (useDefaultImageCheckBox.isChecked()) {
-            post.image_post = "1";
+            lenta_json.image_post = "1";
         } else if (selectedImageBitmap != null) {
             try {
-                post.image_post = createPostWithImage(selectedImageBitmap);
+                lenta_json.image_post = createPostWithImage(selectedImageBitmap);
             } catch (Exception e) {
                 showError("Ошибка обработки изображения");
-                return null;
+
             }
         } else {
             showError("Выберите изображение");
-            return null;
+
         }
-        return post;
+
     }
 
 

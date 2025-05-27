@@ -4,7 +4,14 @@
     <color name="white">#FFFFFFFF</color>
     <color name="background">#212121</color>
     <color name="Tint">#94000000</color>
-
+    <color name="light_gray">#F5F5F5</color>
     <color name="post_body">#424242</color>
     <color name="post_title">#212121</color>
+    <color name="primary">#6200EE</color>
+    <color name="primary_dark">#3700B3</color>
+    <color name="primary_light">#BB86FC</color>
+    <color name="teal_700">#018786</color>
+    <color name="gray_600">#757575</color>
+    <color name="shadow_color">#33000000</color>
+    <color name="light_shadow">#1A000000</color>
 </resources>

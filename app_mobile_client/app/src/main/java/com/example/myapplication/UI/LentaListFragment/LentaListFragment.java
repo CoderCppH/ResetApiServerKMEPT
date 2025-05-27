@@ -2,31 +2,26 @@ package com.example.myapplication.UI.LentaListFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
-
 import com.example.myapplication.ACTIVITY.AddLentaViewActivity;
-import com.example.myapplication.ACTIVITY.FriendAddActivity;
 import com.example.myapplication.ACTIVITY.LentaViewActivity;
-import com.example.myapplication.ACTIVITY.MessangerActivity;
 import com.example.myapplication.API.HttpClient;
 import com.example.myapplication.API.json_p_lenta;
 import com.example.myapplication.API.json_p_user;
 import com.example.myapplication.GL.GL;
 import com.example.myapplication.LIST_LENTA.LentaAdapter;
 import com.example.myapplication.LIST_LENTA.p_lenta_item;
-import com.example.myapplication.LIST_USER.UserAdapter;
-import com.example.myapplication.LIST_USER.p_user_item;
 import com.example.myapplication.R;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -39,76 +34,89 @@ public class LentaListFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private LentaAdapter adapter;
-    private List<p_lenta_item> list;
+    private List<p_lenta_item> list = new ArrayList<>();
+    private MaterialToolbar toolbar;
+    private HttpClient api = new HttpClient();
+    private Gson gson = new Gson();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lenta_list, container, false);
-        recyclerView = view.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        list = new ArrayList<>();
-        adapter = new LentaAdapter(inflater, list);
-
-        adapter.setOnItemClickListener(position -> {
-            p_lenta_item clickedItem = list.get(position);
-            clickedItem.SetNullImage();
-            var intent_view_lenta = new Intent(view.getContext(), LentaViewActivity.class);
-            intent_view_lenta.putExtra("lenta_json", new Gson().toJson(clickedItem));
-            startActivity(intent_view_lenta);
-        });
-
-        recyclerView.setAdapter(adapter);
-
-        Init(view);
-        fetchData();
+        initViews(view);
+        setupRecyclerView(inflater);
+        setupListeners();
+        refreshData();
 
         return view;
     }
 
-    private void fetchData() {
+    private void initViews(View view) {
+        toolbar = view.findViewById(R.id.btn_refresh);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        view.findViewById(R.id.btn_add_post).setOnClickListener(v ->
+                startActivity(new Intent(getContext(), AddLentaViewActivity.class))
+        );
+    }
+
+    private void setupRecyclerView(LayoutInflater inflater) {
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new LentaAdapter(inflater, list);
+        recyclerView.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(position -> {
+            p_lenta_item clickedItem = list.get(position);
+            Intent intent = new Intent(getContext(), LentaViewActivity.class);
+            intent.putExtra("lenta_json", gson.toJson(clickedItem));
+            startActivity(intent);
+        });
+    }
+
+    private void setupListeners() {
+        toolbar.setOnClickListener(v -> refreshData());
+    }
+
+    private void refreshData() {
         CompletableFuture.runAsync(() -> {
             try {
-                HttpClient api = new HttpClient();
                 String response = api.GET(GL.url_api_server + "lenta");
-                //Log.d("API.GET.LENTA", response);
-
-                Gson gson = new Gson();
                 Type lentaListType = new TypeToken<List<json_p_lenta>>() {}.getType();
                 List<json_p_lenta> lentaList = gson.fromJson(response, lentaListType);
 
+                List<p_lenta_item> newList = new ArrayList<>();
                 for (json_p_lenta lenta : lentaList) {
-                    p_lenta_item p_lnt = new p_lenta_item
-                            (
-                                    lenta.name_post,
-                                    lenta.description_post,
-                                    lenta.image_post,
-                                    lenta.id_user
-                            );
-
-                    list.add(p_lnt);
+                    json_p_user user = gson.fromJson(
+                            api.GET(GL.url_api_server + "users/" + lenta.id_user + "/"),
+                            json_p_user.class
+                    );
+                    newList.add(new p_lenta_item(
+                            lenta.id,
+                            lenta.name_post,
+                            lenta.description_post,
+                            lenta.image_post,
+                            lenta.id_user,
+                            user.email
+                    ));
                 }
 
-                if(getActivity() == null) return;
-
-                getActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                requireActivity().runOnUiThread(() -> {
+                    list.clear();
+                    list.addAll(newList);
+                    adapter.notifyDataSetChanged();
+                });
             } catch (Exception e) {
-                Log.e("API.GET.USERS", "Error fetching data", e);
+                Log.e("API", "Ошибка загрузки: " + e.getMessage());
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getContext(), "Ошибка обновления", Toast.LENGTH_SHORT).show()
+                );
             }
         });
     }
-    private void Init(View view) {
-        ImageButton btn = view.findViewById(R.id.btn_add_post);
-        btn.setOnClickListener(v -> {
-           var intent = new Intent(view.getContext(), AddLentaViewActivity.class);
-           startActivity(intent);
-        });
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshData();
     }
-   /* private List<p_lenta_item> getData() {
-        ArrayList<p_lenta_item> list = new ArrayList<p_lenta_item>();
-        p_lenta_item item = new p_lenta_item();
-        list.add(item);
-        return list;
-    }*/
 }

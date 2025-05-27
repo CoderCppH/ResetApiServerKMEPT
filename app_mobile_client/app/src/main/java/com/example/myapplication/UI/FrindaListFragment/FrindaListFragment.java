@@ -18,6 +18,7 @@ import com.example.myapplication.ACTIVITY.FriendAddActivity;
 import com.example.myapplication.ACTIVITY.MessangerActivity;
 import com.example.myapplication.API.HttpClient;
 import com.example.myapplication.API.json_p_user;
+import com.example.myapplication.CONFIG_USER.ConfigUser;
 import com.example.myapplication.GL.GL;
 import com.example.myapplication.LIST_USER.UserAdapter;
 import com.example.myapplication.LIST_USER.p_user_item;
@@ -29,6 +30,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.LongFunction;
 
 public class FrindaListFragment extends Fragment {
 
@@ -57,12 +59,12 @@ public class FrindaListFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         Init(view);
-        fetchData();
+        fetchData(view);
 
         return view;
     }
 
-    private void fetchData() {
+    private void fetchData(View view) {
         CompletableFuture.runAsync(() -> {
             try {
                 HttpClient api = new HttpClient();
@@ -81,6 +83,10 @@ public class FrindaListFragment extends Fragment {
                                     user.first_name + " " + user.last_name,
                                     user.email
                             );
+                    if (p_usr.getEmail().equals(new ConfigUser(view.getContext()).get_user().email))
+                    {
+                        p_usr = new p_user_item(user.id, R.drawable.ic_launcher_foreground, "Избранное", "current user");
+                    }
                     list.add(p_usr);
                 }
 

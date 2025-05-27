@@ -1,28 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <com.google.android.material.textview.MaterialTextView
-        android:textSize="32dp"
-        android:layout_margin="10dp"
-        android:id="@+id/header_text"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <!-- App Bar with Actions -->
+    <com.google.android.material.appbar.MaterialToolbar
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-        android:lineHeight="24sp"
-        android:textIsSelectable="true"
-        android:breakStrategy="high_quality"
-        android:hyphenationFrequency="full"/>
-    <com.google.android.material.textview.MaterialTextView
-        android:layout_margin="10dp"
-        android:id="@+id/body_text"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        android:elevation="4dp">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:onClick="BackImage"
+            android:src="@drawable/baseline_arrow_back_24"
+            android:contentDescription="Back"
+            app:tint="@color/black" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:layout_gravity="center"
+            android:id="@+id/id_delete_btn_lv"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:scaleType="fitXY"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:onClick="DeleteImage"
+            android:src="@drawable/delete_1487_svgrepo_com"
+            android:contentDescription="Delete"
+            android:layout_marginEnd="8dp"
+            app:tint="#F44336" />
+
+        <ImageButton
+            android:id="@+id/id_edit_btn_lv"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:onClick="EditImage"
+            android:src="@drawable/edit"
+            android:contentDescription="Edit"
+            android:layout_marginEnd="8dp"
+            app:tint="#5462AB" />
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <!-- Content Area -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        android:lineHeight="24sp"
-        android:textIsSelectable="true"
-        android:breakStrategy="high_quality"
-        android:hyphenationFrequency="full"/>
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Header Text -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/header_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Header"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+                android:textColor="@color/black"
+                android:textIsSelectable="true"
+                android:lineHeight="32sp"
+                android:breakStrategy="high_quality"
+                android:hyphenationFrequency="full"/>
+
+            <!-- Image -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="290dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <ImageView
+                    android:id="@+id/image_lenta"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_launcher_background"
+                    android:contentDescription="Post Image"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Body Text -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/body_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Main Text"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                android:textColor="@color/black"
+                android:textIsSelectable="true"
+                android:lineHeight="24sp"
+                android:breakStrategy="high_quality"
+                android:hyphenationFrequency="full"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

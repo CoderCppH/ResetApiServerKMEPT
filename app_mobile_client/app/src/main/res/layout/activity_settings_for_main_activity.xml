@@ -1,105 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="@color/background"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-<Button
-    android:textColor="@color/white"
-    android:layout_margin="10dp"
-    android:backgroundTint="#3F51B5"
-    android:text="exit acc"
-    android:onClick="btn_exit_clicked"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-</Button>
-    <androidx.cardview.widget.CardView
-        android:backgroundTint="#121212"
-        android:layout_margin="10dp"
-        app:cardCornerRadius="25dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <androidx.cardview.widget.CardView
-            android:layout_margin="15dp"
-            android:padding="10dp"
-            android:backgroundTint="@color/white"
-            app:cardCornerRadius="25dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:textSize="25dp"
-                android:textColorHint="#2897A2"
-                android:id="@+id/settings_id_edit_email"
-                android:layout_margin="10dp"
-                android:hint="Edit email"
-                android:textColor="@color/black"
-                android:background="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="35dp">
-            </TextView>
-        </androidx.cardview.widget.CardView>
-            <androidx.cardview.widget.CardView
-                android:layout_margin="15dp"
-                android:padding="10dp"
-                android:backgroundTint="@color/white"
-                app:cardCornerRadius="25dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:textColorHint="@color/black"
-                    android:id="@+id/settings_id_edit_first_name"
-                    android:layout_margin="10dp"
-                    android:hint="Edit firstname"
-                    android:textColor="@color/black"
-                    android:background="@color/white"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp">
-                </EditText>
-            </androidx.cardview.widget.CardView>
-            <androidx.cardview.widget.CardView
-                android:layout_margin="15dp"
-                android:padding="10dp"
-                android:backgroundTint="@color/white"
-                app:cardCornerRadius="25dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:textColorHint="@color/black"
-                    android:id="@+id/settings_id_edit_last_name"
-                    android:layout_margin="10dp"
-                    android:hint="Edit lastname"
-                    android:textColor="@color/black"
-                    android:background="@color/white"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp">
-                </EditText>
-            </androidx.cardview.widget.CardView>
-            <Button
-                android:onClick="btn_update_data_user"
-                android:textColor="@color/white"
-                android:backgroundTint="#4CAF50"
-                android:text="Confirm"
-                android:layout_margin="15dp"
-                android:layout_gravity="right"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp">
-            </Button>
-            <Button
-                android:onClick="btn_delete_user"
-                android:textColor="@color/white"
-                android:backgroundTint="#F44336"
-                android:text="Delete"
-                android:layout_margin="15dp"
-                android:layout_gravity="right"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp">
-            </Button>
-        </LinearLayout>
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical"
+    android:padding="16dp">
 
+    <!-- Exit Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_exit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:onClick="btn_exit_clicked"
+        android:text="Exit Account"
+        android:textColor="@color/white"
+        app:backgroundTint="#3F51B5"
+        app:cornerRadius="8dp"
+        app:icon="@drawable/exit_svgrepo_com"
+        app:iconTint="@color/white" />
+
+    <!-- Main Settings Card -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        app:cardBackgroundColor="#121212"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Email Field (Non-editable) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:boxBackgroundMode="outline"
+                app:boxBackgroundColor="@color/white"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxStrokeColor="#2897A2"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/settings_id_edit_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:text="user@example.com"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- First Name Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:boxBackgroundMode="outline"
+                app:boxBackgroundColor="@color/white"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxStrokeColor="#2897A2">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/settings_id_edit_first_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="John"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Last Name Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:boxBackgroundMode="outline"
+                app:boxBackgroundColor="@color/white"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxStrokeColor="#2897A2">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/settings_id_edit_last_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Doe"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:onClick="btn_update_data_user"
+                    android:text="Update"
+                    android:textColor="@color/white"
+                    app:backgroundTint="#4CAF50"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/update_svgrepo_com"
+                    app:iconTint="@color/white" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="btn_delete_user"
+                    android:text="Delete Account"
+                    android:textColor="@color/white"
+                    app:backgroundTint="#F44336"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/delete_1487_svgrepo_com"
+                    app:iconTint="@color/white" />
+            </LinearLayout>
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 </LinearLayout>

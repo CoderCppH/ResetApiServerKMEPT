@@ -123,10 +123,14 @@ app.MapGet("/api/messagers/{id_user_from}/{id_user_to}",
             // Получаем все сообщения из базы данных
             var list_message = comm.SelectFrom<Orm.Type.Message>("messagers");
             // Фильтруем сообщения: сначала от отправителя, затем от получателя
-            var filteredMessages = list_message
-                ?.Where(item => (item.user_from_id == id_user_from || item.user_from_id == id_user_to ) && (item.user_to_id == id_user_to || item.user_to_id ==id_user_from) && (item.user_from_id != item.user_to_id))
-                .OrderBy(item => item.timestamp)
-                .ToArray();
+           var filteredMessages = list_message
+            ?.Where(item => 
+            // Диалог между двумя пользователями в любом направлении
+                (item.user_from_id == id_user_from && item.user_to_id == id_user_to) ||
+                (item.user_from_id == id_user_to && item.user_to_id == id_user_from)
+            )
+            .OrderBy(item => item.timestamp)
+            .ToArray();
             System.Console.WriteLine($"From_id: {id_user_from}; To_id: {id_user_to}; list_size: {list_message?.Count}; filter_size: {filteredMessages?.Count()}");
             return Results.Ok(filteredMessages);
         }

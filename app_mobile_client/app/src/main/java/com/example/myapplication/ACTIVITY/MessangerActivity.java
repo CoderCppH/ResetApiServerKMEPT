@@ -1,13 +1,17 @@
 package com.example.myapplication.ACTIVITY;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -32,6 +36,10 @@ public class MessangerActivity extends AppCompatActivity {
     private ConfigUser configUser;
     private p_user_item friend;
     private Person me_person;
+
+    private ImageButton btn_send_message;
+    private ImageButton btn_send_file;
+    EditText messageEditText;
 
     // Класс модели сообщения
     public static class Message {
@@ -76,11 +84,36 @@ public class MessangerActivity extends AppCompatActivity {
     private ListView listView;
     private MessageAdapter adapter;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mesanger_user);
         var setup = new SetUp(this);
+
+        btn_send_message = findViewById(R.id.btn_send_message_id);
+        btn_send_message.setVisibility(View.GONE);
+        btn_send_file = findViewById(R.id.btn_send_file_li_id);
+        messageEditText = findViewById(R.id.message_id_send_text);
+
+        messageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                btn_send_message.setVisibility(View.VISIBLE);
+                btn_send_file.setVisibility(View.GONE);
+                if (messageEditText.getText().toString().length() == 0) {
+                    btn_send_message.setVisibility(View.GONE);
+                    btn_send_file.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
 
         listView = findViewById(R.id.message_id_list_view);
         configUser = new ConfigUser(this);
@@ -105,7 +138,6 @@ public class MessangerActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 String url = GL.url_api_server + String.format("messagers/%s/%s", me_person.id, friend.getId());
-                Log.d("URI_GET_MESSAGE", url);
                 String res = api.GET(url);
 
                 if (res != null) {
@@ -179,7 +211,7 @@ public class MessangerActivity extends AppCompatActivity {
     }
     public void OnButtonClickSendMessage(View view) {
 
-        EditText messageEditText = findViewById(R.id.message_id_send_text);
+        messageEditText = findViewById(R.id.message_id_send_text);
         String text = messageEditText.getText().toString().trim();
 
         Log.d("EDIT_TEXT_LOG", text);
@@ -216,7 +248,6 @@ public class MessangerActivity extends AppCompatActivity {
                 // Обработка ответа и обновление UI должны выполняться в основном потоке
                 String finalRes = res; // Для использования в runOnUiThread
                 runOnUiThread(() -> {
-                    Log.d("MessangerActivity", "POST response: " + finalRes);
                     if (finalRes != null) {
                         if ("{\"message\": \"success inserts messagers\"}".equals(finalRes)) {
                             // После успешной отправки обновляем список сообщений
